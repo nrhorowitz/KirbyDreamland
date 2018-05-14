@@ -12,13 +12,13 @@ public class ServerThread implements Runnable {
  private Manager manager;
  private String username;
  private ObjectOutputStream outObj;
- private ArrayList<Sprite> spriteList;
+ private HashTable<Sprite> spriteList;
  private Integer id;
  
    public ServerThread(Socket clientSocket,Manager manager) {
       this.clientSocket=clientSocket;
       this.manager=manager;
-      spriteList = new ArrayList<Sprite>();
+      spriteList = new HashTable<Sprite>(14*16);
 
       id = manager.addPlayer();
    }
@@ -40,7 +40,7 @@ public class ServerThread implements Runnable {
             } catch(Exception e) {
                
             }
-            spriteList = (ArrayList<Sprite>)inObj.readObject();
+            spriteList = (HashTable<Sprite>)inObj.readObject();
             //System.out.println("read");
             manager.update(spriteList);
             if(spriteList==null) {
@@ -68,10 +68,10 @@ public class ServerThread implements Runnable {
  }
  
  public void updateSprite(Sprite mySprite, int id) {
-	 spriteList.set(id,mySprite);
+	 //spriteList.set(id,mySprite);
  }
  
- public void send(ArrayList<Sprite> p) {
+ public void send(HashTable<Sprite> p) {
   try{
    outObj.reset();
    

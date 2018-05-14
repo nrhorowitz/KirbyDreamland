@@ -19,15 +19,15 @@ import javax.imageio.ImageIO;
 public class Sprite implements Serializable {
    private int x,y;
    private String fileName;
-   private boolean player;
+   private int type;
    private boolean playerReady;
    private int level;
    
-   public Sprite(String myFileName, boolean isPlayer) {
+   public Sprite(String myFileName, int myType) {
       x=(int)(Math.random()*13);
       y=(int)(Math.random()*13);
 	  fileName = myFileName;
-	  player = isPlayer;
+	  type = myType;
 	  playerReady = false;
 	  level = 0;
    }
@@ -49,8 +49,8 @@ public class Sprite implements Serializable {
    public String getFileName() {
 	   return fileName;
    }
-   public boolean isPlayer() {
-	   return player;
+   public int getType() {
+	   return type;
    }
    public int getLevel() {
 	   return level;
@@ -63,5 +63,10 @@ public class Sprite implements Serializable {
    }
    public boolean getPlayerReady() {
 	   return playerReady;
+   }
+   @Override
+   public int hashCode() {
+	   int hashCode = ((x*14)+(y));
+	   return hashCode;
    }
 }

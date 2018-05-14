@@ -19,7 +19,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    private ObjectOutputStream outObj;
    private String username="";
    private Integer id;
-   private ArrayList<Sprite> spriteList;
+   private HashTable<Sprite> spriteList;
    private boolean up,left,down,right;
    private int level;
    private boolean readyToBegin;
@@ -35,7 +35,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    
    public ClientScreen() {
       this.setLayout(null);
-      spriteList = new ArrayList<Sprite>();
+      spriteList = new HashTable<Sprite>(14*16);
 	  level = 0;
 	  id=-1;
       readyToBegin = false;
@@ -86,7 +86,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 		  
 	  }
 	  //always draw characters
-	  for(int i=0;i<spriteList.size();i++) {
+	  /*for(int i=0;i<spriteList.size();i++) {
 		  BufferedImage myImage = null;
 		  try {
 			  myImage = ImageIO.read(new File (spriteList.get(i).getFileName()));
@@ -97,7 +97,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 		  }
 		 
 		 g.drawImage(myImage, spriteList.get(i).getX()*50, spriteList.get(i).getY()*50, null);
-	  }
+	  }*/
    }
    
    public void createImages() {
@@ -140,11 +140,13 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
             } catch(InterruptedException ex) {
                Thread.currentThread().interrupt();
             }
-			ArrayList<Sprite> fromServer = (ArrayList<Sprite>)inObj.readObject();
+			System.out.println("HAS NOT READ FROM SERVER");
+			HashTable<Sprite> fromServer = (HashTable<Sprite>)inObj.readObject();
+			System.out.println("READ FROM SERVER");
 			if(level == 0) {
 				nextLevel = true;
 				for(int i=0; i<fromServer.size(); i++) {
-					if(fromServer.get(i).isPlayer()) {
+					if(fromServer.get(i).getType() == 0) {
 						if(!fromServer.get(i).getPlayerReady()) {
 							nextLevel = false;
 						}

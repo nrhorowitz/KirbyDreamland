@@ -9,11 +9,11 @@ import java.util.ArrayList;
 
 public class Manager {
  private ArrayList<ServerThread> threads;
- private ArrayList<Sprite> spriteList;
+ private HashTable<Sprite> spriteList;
  
  public Manager() {
   threads = new ArrayList<ServerThread>();
-  spriteList = new ArrayList<Sprite>();
+  spriteList = new HashTable<Sprite>(14*16);
  }
  
  public void add(ServerThread st) {
@@ -24,7 +24,7 @@ public class Manager {
   threads.remove(st);
  }
  
- public ArrayList<Sprite> getSpriteList() {
+ public HashTable<Sprite> getSpriteList() {
     return(spriteList);
  }
  
@@ -40,16 +40,16 @@ public class Manager {
    } else {
 	   myImage = "Resources/Kirby4A.png";
    } 
-   spriteList.add(new Sprite(myImage, true));
+   spriteList.add(new Sprite(myImage, 0));
    return(spriteList.size()-1);
  }
  
- public void updatePlayers(ArrayList<Sprite> mySpriteList) {
+ public void updatePlayers(HashTable<Sprite> mySpriteList) {
 	 spriteList = mySpriteList;
  }
 
  
- public void update(ArrayList<Sprite> mySpriteList) {
+ public void update(HashTable<Sprite> mySpriteList) {
   for(int i=0;i<threads.size();i++) {
     threads.get(i).send(mySpriteList);
   }
