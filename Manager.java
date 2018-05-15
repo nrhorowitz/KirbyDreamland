@@ -48,8 +48,7 @@ public class Manager {
 	 spriteList = mySpriteList;
  }
 
- 
- public void update(HashTable<Sprite> mySpriteList) {
+ public void update(Object mySpriteList) {
   for(int i=0;i<threads.size();i++) {
     threads.get(i).send(mySpriteList);
   }

@@ -40,12 +40,19 @@ public class ServerThread implements Runnable {
             } catch(Exception e) {
                
             }
-            spriteList = (HashTable<Sprite>)inObj.readObject();
-            //System.out.println("read");
-            manager.update(spriteList);
-            if(spriteList==null) {
-               break;
-            }
+			Object objectFromServer = inObj.readObject();
+			if(objectFromServer instanceof String) {
+				String fromServer = (String)objectFromServer;
+				System.out.println(fromServer);
+			} else { //HashTable
+				spriteList = (HashTable<Sprite>)objectFromServer;
+				//System.out.println("read");
+				manager.update(spriteList);
+				if(spriteList==null) {
+				   break;
+				}
+			}
+            
          }
          
          outObj.flush();
@@ -71,7 +78,7 @@ public class ServerThread implements Runnable {
 	 //spriteList.set(id,mySprite);
  }
  
- public void send(HashTable<Sprite> p) {
+ public void send(Object p) {
   try{
    outObj.reset();
    

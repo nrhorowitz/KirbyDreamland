@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.util.Set;
+import java.util.HashSet;
 
 public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    private ObjectOutputStream outObj;
@@ -27,6 +29,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    private BufferedImage myStartImage = null;
 	private BufferedImage readyButtonImage0 = null;
 	private BufferedImage readyButtonImage1 = null;
+   private HashSet<String> imageStrings;
    private static final int SPEED = 1;
    private static final int READY_BOX_X = 200;
    private static final int READY_BOX_Y = 605;
@@ -39,6 +42,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 	  level = 0;
 	  id=-1;
       readyToBegin = false;
+	  imageStrings = new HashSet<String>();
       this.addKeyListener(this);
 	  this.addMouseListener(this);
       this.setFocusable(true);
@@ -140,40 +144,17 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
             } catch(InterruptedException ex) {
                Thread.currentThread().interrupt();
             }
-			System.out.println("HAS NOT READ FROM SERVER");
-			HashTable<Sprite> fromServer = (HashTable<Sprite>)inObj.readObject();
-			System.out.println("READ FROM SERVER");
-			if(level == 0) {
-				nextLevel = true;
-				for(int i=0; i<fromServer.size(); i++) {
-					if(fromServer.get(i).getType() == 0) {
-						if(!fromServer.get(i).getPlayerReady()) {
-							nextLevel = false;
-						}
-					}
+			Object objectFromServer = inObj.readObject();
+			if(objectFromServer instanceof String) {
+				String fromServer = (String)objectFromServer;
+				System.out.println(fromServer);
+			} else { //is a HashTable
+				HashTable<Sprite> fromServer = (HashTable<Sprite>)objectFromServer;
+				if(fromServer==null) {
+				   break;
 				}
-				if(nextLevel) {
-					level = 1;
-					
-					//this.writeObject(fromServer);
-					//fromServer = (ArrayList<Sprite>)inObj.readObject();
-				}
-			} if(level == 1) {
-				if(nextLevel) {
-					if(id == 0) {
-						fromServer.get(id).move(0,0);
-					} else if(id == 1) {
-						fromServer.get(id).move(15,0);
-					} 
-					nextLevel = false;
-				}
+				spriteList = fromServer;
 			}
-			
-            if(fromServer==null) {
-               break;
-            }
-            spriteList = fromServer;
-            
             repaint();
          }
       } catch(UnknownHostException e) {
@@ -200,20 +181,33 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    
    public void keyPressed(KeyEvent e) {
         //System.out.println(e.getKeyCode());
-        if (e.getKeyCode() == 87) { //w
-            spriteList.get(id).move(spriteList.get(id).getX(),spriteList.get(id).getY()-SPEED);
-        }
-        if (e.getKeyCode() == 65) { //a
-            spriteList.get(id).move(spriteList.get(id).getX()-SPEED,spriteList.get(id).getY());
-        }
-        if (e.getKeyCode() == 83) { //s
-            spriteList.get(id).move(spriteList.get(id).getX(),spriteList.get(id).getY()+SPEED);
-        }
-        if (e.getKeyCode() == 68) { //d
-            spriteList.get(id).move(spriteList.get(id).getX()+SPEED,spriteList.get(id).getY());
-        }
+		try {
+			outObj.reset();
+			if(e.getKeyCode() == 87) { //w
+				outObj.writeObject(id + ":up");
+			} else if(e.getKeyCode() == 65) { //a
+				outObj.writeObject(id + ":left");
+			} else if(e.getKeyCode() == 83) { //s
+				outObj.writeObject(id + ":down");
+			} else if(e.getKeyCode() == 68) { //d
+				outObj.writeObject(id + ":right");
+			}
+		}
+		catch(IOException ex) {}
+        // if (e.getKeyCode() == 87) { //w
+            // spriteList.get(id).move(spriteList.get(id).getX(),spriteList.get(id).getY()-SPEED);
+        // }
+        // if (e.getKeyCode() == 65) { //a
+            // spriteList.get(id).move(spriteList.get(id).getX()-SPEED,spriteList.get(id).getY());
+        // }
+        // if (e.getKeyCode() == 83) { //s
+            // spriteList.get(id).move(spriteList.get(id).getX(),spriteList.get(id).getY()+SPEED);
+        // }
+        // if (e.getKeyCode() == 68) { //d
+            // spriteList.get(id).move(spriteList.get(id).getX()+SPEED,spriteList.get(id).getY());
+        // }
         System.out.println("PLAYER" + id + ": " + readyToBegin);
-        this.writeObject(spriteList);
+        //this.writeObject(spriteList);
       
         repaint();
     }

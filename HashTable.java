@@ -1,4 +1,5 @@
-public class HashTable<E> {
+import java.io.Serializable;
+public class HashTable<E> implements Serializable {
    private DLList<E>[] table;
    @SuppressWarnings("unchecked")
    public HashTable(int size) {
@@ -22,7 +23,7 @@ public class HashTable<E> {
    public int size() {
 	   int size = 0;
 	   for(int i=0; i<table.length; i++) {
-		   if(table[i] != null) {
+		   if(table[i].size() > 0) {
 			   size++;
 		   }
 	   }
