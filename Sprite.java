@@ -66,7 +66,11 @@ public class Sprite implements Serializable {
    }
    @Override
    public int hashCode() {
-	   int hashCode = ((x*14)+(y));
+	   int hashCode = ((x*16)+(y));
 	   return hashCode;
+   }
+   @Override
+   public String toString() {
+      return (fileName + ":" + hashCode() + ",X:" + x + ",Y:" + y);
    }
 }

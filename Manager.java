@@ -40,11 +40,14 @@ public class Manager {
    } else {
 	   myImage = "Resources/Kirby4A.png";
    } 
-   spriteList.add(new Sprite(myImage, 0));
-   return(spriteList.size()-1);
+   Sprite addSprite = new Sprite(myImage,count);
+   if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+      spriteList.add(addSprite);
+   }
+   return(addSprite.hashCode());
  }
  
- public void updatePlayers(HashTable<Sprite> mySpriteList) {
+ public void updateSpriteList(HashTable<Sprite> mySpriteList) {
 	 spriteList = mySpriteList;
  }
 

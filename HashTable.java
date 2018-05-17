@@ -10,6 +10,7 @@ public class HashTable<E> implements Serializable {
    }
    public void add(E myData) {
       table[myData.hashCode()].add(myData);
+      System.out.println(myData.toString());
    }
    public void remove(E myData) {
       table[myData.hashCode()].remove(myData);
@@ -18,7 +19,7 @@ public class HashTable<E> implements Serializable {
       return table[index];
    }
    public E get(int index) {
-	   return table[index].get(index);
+	   return table[index].get(0);
    }
    public int size() {
 	   int size = 0;
@@ -28,6 +29,9 @@ public class HashTable<E> implements Serializable {
 		   }
 	   }
 	   return size;
+   }
+   public int rawSize() {
+      return table.length;
    }
    public String toString() {
       String total = "";

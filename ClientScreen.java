@@ -16,12 +16,15 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    private ObjectOutputStream outObj;
-   private String username="";
+   private String username = "";
    private Integer id;
    private HashTable<Sprite> spriteList;
+   private Map<String, BufferedImage> imageStrings;
    private boolean up,left,down,right;
    private int level;
    private boolean readyToBegin;
@@ -29,7 +32,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    private BufferedImage myStartImage = null;
 	private BufferedImage readyButtonImage0 = null;
 	private BufferedImage readyButtonImage1 = null;
-   private HashSet<String> imageStrings;
+   
    private static final int SPEED = 1;
    private static final int READY_BOX_X = 200;
    private static final int READY_BOX_Y = 605;
@@ -42,7 +45,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 	  level = 0;
 	  id=-1;
       readyToBegin = false;
-	  imageStrings = new HashSet<String>();
+	  imageStrings = new HashMap<String,BufferedImage>();
       this.addKeyListener(this);
 	  this.addMouseListener(this);
       this.setFocusable(true);
@@ -57,6 +60,8 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
     public void paintComponent(Graphics g)
     {
       this.requestFocusInWindow();
+      drawHashTable(g);
+      /*
       if(level == 0) {
 		 g.drawImage(myStartImage, 0, 0, null);
 		 if(readyToBegin) {
@@ -87,8 +92,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 		  }
 		 g.drawImage(level1Image, 0, 0, null);
 		  drawGrid(g);
-		  
+		  drawHashTable(g);
 	  }
+	  */
 	  //always draw characters
 	  /*for(int i=0;i<spriteList.size();i++) {
 		  BufferedImage myImage = null;
@@ -103,12 +109,32 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 		 g.drawImage(myImage, spriteList.get(i).getX()*50, spriteList.get(i).getY()*50, null);
 	  }*/
    }
+    
+    public void drawHashTable(Graphics g) {
+       for(int i=0; i<spriteList.rawSize(); i++) {
+          for(int j=0; j<spriteList.getList(i).size(); j++) {
+             g.drawImage(imageStrings.get(spriteList.getList(i).get(j).getFileName()), spriteList.getList(i).get(j).getX()*50, spriteList.getList(i).get(j).getY()*50, null);
+          }
+       }
+    }
    
    public void createImages() {
 	  try {
-		  myStartImage = ImageIO.read(new File ("Resources/StartScreen2.png"));
-		  readyButtonImage0 = ImageIO.read(new File ("Resources/ReadyButton0.png"));
-		  readyButtonImage1 = ImageIO.read(new File ("Resources/ReadyButton1.png"));
+	     BufferedImage myStartImage = ImageIO.read(new File ("Resources/StartScreen2.png"));
+	     BufferedImage readyButtonImage0 = ImageIO.read(new File ("Resources/ReadyButton0.png"));
+	     BufferedImage readyButtonImage1 = ImageIO.read(new File ("Resources/ReadyButton1.png"));
+	     BufferedImage kirby1AImage = ImageIO.read(new File ("Resources/Kirby1A.png"));
+	     BufferedImage kirby2AImage = ImageIO.read(new File ("Resources/Kirby2A.png"));
+	     BufferedImage kirby3AImage = ImageIO.read(new File ("Resources/Kirby3A.png"));
+	     BufferedImage kirby4AImage = ImageIO.read(new File ("Resources/Kirby4A.png"));
+	     imageStrings.put("Resources/StartScreen2.png",myStartImage);
+	     imageStrings.put("Resources/ReadyButton0.png",readyButtonImage0);
+	     imageStrings.put("Resources/ReadyButton1.png",readyButtonImage1);
+	     imageStrings.put("Resources/Kirby1A.png", kirby1AImage);
+	     imageStrings.put("Resources/Kirby2A.png", kirby2AImage);
+	     imageStrings.put("Resources/Kirby3A.png", kirby3AImage);
+	     imageStrings.put("Resources/Kirby4A.png", kirby4AImage);
+		  
 	  } catch (FileNotFoundException ex) {
 		  System.out.println(ex);
 	  } catch (IOException ex) {
@@ -128,7 +154,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    
    public void poll() {
       String hostName="localhost";
-      int portNumber=1024;
+      int portNumber=1023;
       try {
          Socket serverSocket=new Socket(hostName,portNumber);
          outObj = new ObjectOutputStream(serverSocket.getOutputStream());
@@ -150,6 +176,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 				System.out.println(fromServer);
 			} else { //is a HashTable
 				HashTable<Sprite> fromServer = (HashTable<Sprite>)objectFromServer;
+				System.out.println("RECIVED HAHSTABLE");
 				if(fromServer==null) {
 				   break;
 				}
@@ -206,7 +233,6 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
         // if (e.getKeyCode() == 68) { //d
             // spriteList.get(id).move(spriteList.get(id).getX()+SPEED,spriteList.get(id).getY());
         // }
-        System.out.println("PLAYER" + id + ": " + readyToBegin);
         //this.writeObject(spriteList);
       
         repaint();
