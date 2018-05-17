@@ -51,9 +51,16 @@ public class ServerThread implements Runnable {
    				System.out.println(fromServer);
    				String[] commandArray = fromServer.split(":");
    				int uniqueId = Integer.parseInt(commandArray[0]);
-   				System.out.println("UNIQUEID: " + uniqueId + " SPRITE:" + spriteList.get(uniqueId));
+   				//System.out.println("UNIQUEID: " + uniqueId + " SPRITE:" + spriteList.get(uniqueId));
    				String commandMessage = commandArray[1];
-   				if(commandMessage.equals("up")) {
+   				if(commandMessage.equals("level")) {
+   				   String readyToBeginMessage = commandArray[3];
+   				   if(readyToBeginMessage.equals("true")) {
+   				      manager.setPlayersReady(manager.getPlayersReady()+1);
+   				   } else if(readyToBeginMessage.equals("false")) {
+   				      manager.setPlayersReady(manager.getPlayersReady()-1);
+   				   }
+   				} else if(commandMessage.equals("up")) {
    				   if(spriteList.get(uniqueId).getY() > 0) {
    				      if(spriteList.getList((uniqueId-1)).size() == 0) {
    				         spriteList.get(uniqueId).move(spriteList.get(uniqueId).getX(),spriteList.get(uniqueId).getY()-1);

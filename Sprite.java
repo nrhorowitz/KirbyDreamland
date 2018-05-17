@@ -64,6 +64,24 @@ public class Sprite implements Serializable {
    public boolean getPlayerReady() {
 	   return playerReady;
    }
+   public String enemyMove(String previousStep) {
+      int random = (int)(Math.random() * 100);
+      
+      int threshold;
+      if(previousStep.equals("left")) {
+         threshold = 50;
+      } else if(previousStep.equals("right")) {
+         
+      } else if(previousStep.equals("up")) {
+         
+      } else if(previousStep.equals("down")) {
+         
+      }
+      if(random < 70) {
+         return previousStep;
+      }
+      return "right";
+   }
    @Override
    public int hashCode() {
 	   int hashCode = ((x*16)+(y));

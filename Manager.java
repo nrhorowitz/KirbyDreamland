@@ -10,10 +10,15 @@ import java.util.ArrayList;
 public class Manager {
  private ArrayList<ServerThread> threads;
  private HashTable<Sprite> spriteList;
+ private int level;
+ private int playersReady;
+ 
  
  public Manager() {
   threads = new ArrayList<ServerThread>();
   spriteList = new HashTable<Sprite>(14*16);
+  level = 0;
+  playersReady = 0;
  }
  
  public void add(ServerThread st) {
@@ -55,5 +60,29 @@ public class Manager {
   for(int i=0;i<threads.size();i++) {
     threads.get(i).send(mySpriteList);
   }
+ }
+ 
+ public int getLevel() {
+    return level;
+ }
+ public int getPlayersReady() {
+    return playersReady;
+ }
+ public void setPlayersReady(int myPlayersReady) {
+    playersReady = myPlayersReady;
+    if(playersReady == threads.size()) {
+       //everyone ready
+       level++;
+       update("level:" + level);
+       beginLevel(level);
+    }
+ }
+ private void beginLevel(int myLevel) {
+    if(myLevel == 1) {
+       String myImage = "Resources/Enemy2A.png";
+       spriteList.add(new Sprite(myImage, 10));
+       spriteList.add(new Sprite(myImage, 10));
+       spriteList.add(new Sprite(myImage, 10));
+    }
  }
 }

@@ -60,6 +60,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
     public void paintComponent(Graphics g)
     {
       this.requestFocusInWindow();
+      drawBackground(g);
       drawHashTable(g);
       /*
       if(level == 0) {
@@ -127,6 +128,8 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 	     BufferedImage kirby2AImage = ImageIO.read(new File ("Resources/Kirby2A.png"));
 	     BufferedImage kirby3AImage = ImageIO.read(new File ("Resources/Kirby3A.png"));
 	     BufferedImage kirby4AImage = ImageIO.read(new File ("Resources/Kirby4A.png"));
+	     BufferedImage level1BackgroundImage = ImageIO.read(new File ("Resources/Level1Background.png"));
+	     BufferedImage enemy2AImage = ImageIO.read(new File ("Resources/Enemy2A.png"));
 	     imageStrings.put("Resources/StartScreen2.png",myStartImage);
 	     imageStrings.put("Resources/ReadyButton0.png",readyButtonImage0);
 	     imageStrings.put("Resources/ReadyButton1.png",readyButtonImage1);
@@ -134,6 +137,8 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 	     imageStrings.put("Resources/Kirby2A.png", kirby2AImage);
 	     imageStrings.put("Resources/Kirby3A.png", kirby3AImage);
 	     imageStrings.put("Resources/Kirby4A.png", kirby4AImage);
+	     imageStrings.put("Resources/Level1Background.png", level1BackgroundImage);
+	     imageStrings.put("Resources/Enemy2A.png", enemy2AImage);
 		  
 	  } catch (FileNotFoundException ex) {
 		  System.out.println(ex);
@@ -150,6 +155,33 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 	   for(int i=0; i<=(700/50); i++) {
 		   g.drawLine(0,(i*50),800,(i*50));
 	   }
+   }
+   
+   public void drawBackground(Graphics g) {
+      System.out.println("drawBackground " + level);
+      if(level == 0) {
+         g.drawImage(imageStrings.get("Resources/StartScreen2.png"),0,0,null);
+         if(readyToBegin) {
+            g.drawImage(imageStrings.get("Resources/ReadyButton1.png"), READY_BOX_X, READY_BOX_Y, null);
+         } else {
+            g.drawImage(imageStrings.get("Resources/ReadyButton0.png"), READY_BOX_X, READY_BOX_Y, null);
+         }
+         Font myFont = new Font("Arial",50,50);
+         g.setFont(myFont);
+         if(spriteList.get(id).getType() == 0) {
+            g.setColor(Color.pink);
+         } else if(spriteList.get(id).getType() == 1) {
+            g.setColor(Color.orange);
+         } else if(spriteList.get(id).getType() == 2) {
+            g.setColor(Color.cyan);
+         } else if(spriteList.get(id).getType() == 3) {
+            g.setColor(Color.red);
+         }
+         g.drawString("WELCOME PLAYER " + (spriteList.get(id).getType()+1), 50,50);
+      } else if(level == 1) {
+         g.drawImage(imageStrings.get("Resources/Level1Background.png"),0,0,null);
+         drawGrid(g);
+      }
    }
    
    public void poll() {
@@ -170,18 +202,24 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
             } catch(InterruptedException ex) {
                Thread.currentThread().interrupt();
             }
-			Object objectFromServer = inObj.readObject();
-			if(objectFromServer instanceof String) {
-				String fromServer = (String)objectFromServer;
-				System.out.println(fromServer);
-			} else { //is a HashTable
-				HashTable<Sprite> fromServer = (HashTable<Sprite>)objectFromServer;
-				System.out.println("RECIVED HAHSTABLE");
-				if(fromServer==null) {
-				   break;
-				}
-				spriteList = fromServer;
-			}
+   			Object objectFromServer = inObj.readObject();
+   			if(objectFromServer instanceof String) {
+   				String fromServer = (String)objectFromServer;
+   				System.out.println(fromServer);
+   				String[] commands = fromServer.split(":");
+   				if(commands[0].equals("level")) {
+   				   int levelSet = Integer.parseInt(commands[1]);
+   				   level = levelSet;
+   				}
+   				
+   				
+   			} else { //is a HashTable
+   				HashTable<Sprite> fromServer = (HashTable<Sprite>)objectFromServer;
+   				if(fromServer==null) {
+   				   break;
+   				}
+   				spriteList = fromServer;
+   			}
             repaint();
          }
       } catch(UnknownHostException e) {
@@ -248,10 +286,12 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
  
         //Check if mouse pressed position is in the brown box
         if (e.getX() >= READY_BOX_X && e.getX() <= (READY_BOX_X+READY_BOX_LENGTH) && e.getY() >= READY_BOX_Y && e.getY() <= (READY_BOX_Y+READY_BOX_LENGTH)) {
-            readyToBegin = !readyToBegin;
-			spriteList.get(id).setPlayerReady(readyToBegin);
-			this.writeObject(spriteList);
-		}
+           readyToBegin = !readyToBegin;
+			  String readyMessage = id + ":" + "level" + ":" + level + ":" + readyToBegin;
+			  try {
+			     outObj.writeObject(readyMessage);
+			  } catch(IOException ex) {}
+		  }
  
         repaint();
     }
