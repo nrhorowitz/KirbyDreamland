@@ -51,7 +51,7 @@ public class ServerThread implements Runnable {
    				System.out.println(fromServer);
    				String[] commandArray = fromServer.split(":");
    				int uniqueId = Integer.parseInt(commandArray[0]);
-   				//System.out.println("UNIQUEID: " + uniqueId + " SPRITE:" + spriteList.get(uniqueId));
+   				System.out.println("UNIQUEID: " + uniqueId + " SPRITE:" + spriteList.get(uniqueId));
    				String commandMessage = commandArray[1];
    				if(commandMessage.equals("level")) {
    				   String readyToBeginMessage = commandArray[3];

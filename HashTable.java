@@ -21,6 +21,9 @@ public class HashTable<E> implements Serializable {
    public E get(int index) {
 	   return table[index].get(0);
    }
+   public E get(int index, int listIndex) {
+      return table[index].get(listIndex);
+   }
    public int size() {
 	   int size = 0;
 	   for(int i=0; i<table.length; i++) {
@@ -36,9 +39,11 @@ public class HashTable<E> implements Serializable {
    public String toString() {
       String total = "";
       for(int i=0; i<table.length; i++) {
-         total += "\nbucket " + i;
-         for(int j=0; j<table[i].size(); j++) {
-            total += " " + table[i].get(j);
+         if(table[i].size() > 0) {
+            total += "\nbucket " + i;
+            for(int j=0; j<table[i].size(); j++) {
+               total += " " + table[i].get(j);
+            }
          }
       }
       return total;

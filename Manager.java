@@ -83,6 +83,10 @@ public class Manager {
        spriteList.add(new Sprite(myImage, 10));
        spriteList.add(new Sprite(myImage, 10));
        spriteList.add(new Sprite(myImage, 10));
+       myImage = "Resources/ItemFood1.png";
+       for(int i=0; i<threads.size(); i++) {
+          spriteList.add(new Sprite(myImage, 20));
+       }
     }
  }
 }
