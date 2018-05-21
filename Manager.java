@@ -12,6 +12,7 @@ public class Manager {
  private HashTable<Sprite> spriteList;
  private int level;
  private int playersReady;
+ private int enemyMoveCount;
  
  
  public Manager() {
@@ -19,6 +20,7 @@ public class Manager {
   spriteList = new HashTable<Sprite>(16*16);
   level = 0;
   playersReady = 0;
+  enemyMoveCount = 0;
  }
  
  public void add(ServerThread st) {
@@ -60,6 +62,16 @@ public class Manager {
  }
 
  public void update(Object mySpriteList) {
+    System.out.println("UPDATE");
+    if(mySpriteList instanceof HashTable) {
+       if(enemyMoveCount > 10) {
+          System.out.println("UPDATE: MOVE ENEMIES");
+          enemyMoveCount = 0;
+          moveEnemies();
+       } else {
+          enemyMoveCount++;
+       }
+    }
   for(int i=0;i<threads.size();i++) {
     threads.get(i).send(mySpriteList);
   }
@@ -82,8 +94,22 @@ public class Manager {
  }
  public void moveEnemies() {
     for(int i=0; i<spriteList.rawSize(); i++) {
-       
+       if(spriteList.get(i) != null) {
+          if(spriteList.get(i).getType() == 10) {//enemy
+             //find the closest player
+             int closestPlayer = 0;
+             //find the id of the closest player
+             int closestPlayerId = 0;
+             //pick x or y to move
+             int xy = 0;
+             //move sprite if legal move
+             Sprite temp = spriteList.pop(i);
+             temp.move(temp.getX(), temp.getY()-1);
+             spriteList.add(temp);
+          }
+       }
     }
+    update(spriteList);
  }
  private void beginLevel(int myLevel) {
     if(myLevel == 1) {
