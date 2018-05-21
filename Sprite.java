@@ -22,14 +22,26 @@ public class Sprite implements Serializable {
    private int type;
    private boolean playerReady;
    private int level;
+   private ArrayList<String> itemList;
    
    public Sprite(String myFileName, int myType) {
-      x=(int)(Math.random()*13);
-      y=(int)(Math.random()*13);
+      x=(int)(Math.random()*14)+1;
+      y=(int)(Math.random()*12)+1;
 	  fileName = myFileName;
 	  type = myType;
 	  playerReady = false;
 	  level = 0;
+	  itemList = new ArrayList<String>();
+   }
+   
+   public Sprite(String myFileName, int myType, int myX, int myY) {
+      x=myX;
+      y=myY;
+     fileName = myFileName;
+     type = myType;
+     playerReady = false;
+     level = 0;
+     itemList = new ArrayList<String>();
    }
    
    public void move(int myX,int myY) {
@@ -81,6 +93,15 @@ public class Sprite implements Serializable {
          return previousStep;
       }
       return "right";
+   }
+   public ArrayList<String> getItemList() {
+      return itemList;
+   }
+   public void addItem(String c) {
+      itemList.add(c);
+   }
+   public String getItem(int index) {
+      return itemList.get(index);
    }
    @Override
    public int hashCode() {

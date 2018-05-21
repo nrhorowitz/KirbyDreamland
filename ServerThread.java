@@ -18,7 +18,7 @@ public class ServerThread implements Runnable {
    public ServerThread(Socket clientSocket,Manager manager) {
       this.clientSocket=clientSocket;
       this.manager=manager;
-      spriteList = new HashTable<Sprite>(14*16);
+      spriteList = new HashTable<Sprite>(16*16);
 
       id = manager.addPlayer();
       manager.update(manager.getSpriteList());
@@ -51,7 +51,7 @@ public class ServerThread implements Runnable {
    				System.out.println(fromServer);
    				String[] commandArray = fromServer.split(":");
    				int uniqueId = Integer.parseInt(commandArray[0]);
-   				System.out.println("UNIQUEID: " + uniqueId + " SPRITE:" + spriteList.get(uniqueId));
+   				//System.out.println("UNIQUEID: " + uniqueId + " SPRITE:" + spriteList.get(uniqueId) + "\nLIST:" + spriteList);
    				String commandMessage = commandArray[1];
    				if(commandMessage.equals("level")) {
    				   String readyToBeginMessage = commandArray[3];
@@ -63,25 +63,65 @@ public class ServerThread implements Runnable {
    				} else if(commandMessage.equals("up")) {
    				   if(spriteList.get(uniqueId).getY() > 0) {
    				      if(spriteList.getList((uniqueId-1)).size() == 0) {
-   				         spriteList.get(uniqueId).move(spriteList.get(uniqueId).getX(),spriteList.get(uniqueId).getY()-1);
+   				         Sprite temp = spriteList.pop(uniqueId);
+   				         temp.move(temp.getX(),temp.getY()-1);
+   				         spriteList.add(temp);
+   				      } else {
+   				         if(spriteList.get(uniqueId-1).getType() == 20) { //cake
+   				            Sprite temp = spriteList.pop(uniqueId);
+   				            Sprite food = spriteList.pop(uniqueId-1);
+                           temp.move(temp.getX(),temp.getY()-1);
+                           temp.addItem(food.getFileName());
+                           spriteList.add(temp);
+   				         }
    				      }
    				   }
    				} else if(commandMessage.equals("down")) {
    				   if(spriteList.get(uniqueId).getY() < 13) {
    				      if(spriteList.getList((uniqueId+1)).size() == 0) {
-   				         spriteList.get(uniqueId).move(spriteList.get(uniqueId).getX(),spriteList.get(uniqueId).getY()+1);
-   				      }
+   				         Sprite temp = spriteList.pop(uniqueId);
+                        temp.move(temp.getX(),temp.getY()+1);
+                        spriteList.add(temp);
+   				      } else {
+                        if(spriteList.get(uniqueId+1).getType() == 20) { //cake
+                           Sprite temp = spriteList.pop(uniqueId);
+                           Sprite food = spriteList.pop(uniqueId+1);
+                           temp.move(temp.getX(),temp.getY()+1);
+                           temp.addItem(food.getFileName());
+                           spriteList.add(temp);
+                        }
+                     }
    				   }
                } else if(commandMessage.equals("left")) {
                   if(spriteList.get(uniqueId).getX() > 0) {
                      if(spriteList.getList((uniqueId-16)).size() == 0) {
-                        spriteList.get(uniqueId).move(spriteList.get(uniqueId).getX()-1,spriteList.get(uniqueId).getY());
+                        Sprite temp = spriteList.pop(uniqueId);
+                        temp.move(temp.getX()-1,temp.getY());
+                        spriteList.add(temp);
+                     } else {
+                        if(spriteList.get(uniqueId-16).getType() == 20) { //cake
+                           Sprite temp = spriteList.pop(uniqueId);
+                           Sprite food = spriteList.pop(uniqueId-16);
+                           temp.move(temp.getX()-1,temp.getY());
+                           temp.addItem(food.getFileName());
+                           spriteList.add(temp);
+                        }
                      }
                   }
                } else if(commandMessage.equals("right")) {
                   if(spriteList.get(uniqueId).getX() < 15) {
                      if(spriteList.getList((uniqueId+16)).size() == 0) {
-                        spriteList.get(uniqueId).move(spriteList.get(uniqueId).getX()+1,spriteList.get(uniqueId).getY());
+                        Sprite temp = spriteList.pop(uniqueId);
+                        temp.move(temp.getX()+1,temp.getY());
+                        spriteList.add(temp);
+                     } else {
+                        if(spriteList.get(uniqueId+16).getType() == 20) { //cake
+                           Sprite temp = spriteList.pop(uniqueId);
+                           Sprite food = spriteList.pop(uniqueId+16);
+                           temp.move(temp.getX()+1,temp.getY());
+                           temp.addItem(food.getFileName());
+                           spriteList.add(temp);
+                        }
                      }
                   }
                }

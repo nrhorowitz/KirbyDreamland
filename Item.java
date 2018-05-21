@@ -1,4 +1,3 @@
-
 public class Item {
    public String fileName;
    public Item(String myFileName) {

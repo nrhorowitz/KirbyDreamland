@@ -15,6 +15,11 @@ public class HashTable<E> implements Serializable {
    public void remove(E myData) {
       table[myData.hashCode()].remove(myData);
    }
+   public E pop(int index) {
+      E temp = get(index);
+      remove(temp);
+      return temp;
+   }
    public DLList<E> getList(int index) {
       return table[index];
    }

@@ -16,13 +16,15 @@ public class Manager {
  
  public Manager() {
   threads = new ArrayList<ServerThread>();
-  spriteList = new HashTable<Sprite>(14*16);
+  spriteList = new HashTable<Sprite>(16*16);
   level = 0;
   playersReady = 0;
  }
  
  public void add(ServerThread st) {
-  threads.add(st);
+	 if(level == 0) {
+		 threads.add(st);
+	 }
  }
  
  public void remove(ServerThread st) {
@@ -54,6 +56,7 @@ public class Manager {
  
  public void updateSpriteList(HashTable<Sprite> mySpriteList) {
 	 spriteList = mySpriteList;
+	 update(spriteList);
  }
 
  public void update(Object mySpriteList) {
@@ -77,16 +80,58 @@ public class Manager {
        beginLevel(level);
     }
  }
- private void beginLevel(int myLevel) {
-    if(myLevel == 1) {
-       String myImage = "Resources/Enemy2A.png";
-       spriteList.add(new Sprite(myImage, 10));
-       spriteList.add(new Sprite(myImage, 10));
-       spriteList.add(new Sprite(myImage, 10));
-       myImage = "Resources/ItemFood1.png";
-       for(int i=0; i<threads.size(); i++) {
-          spriteList.add(new Sprite(myImage, 20));
-       }
+ public void moveEnemies() {
+    for(int i=0; i<spriteList.rawSize(); i++) {
+       
     }
  }
+ private void beginLevel(int myLevel) {
+    if(myLevel == 1) {
+	   for(int i=0; i<spriteList.rawSize(); i++) {
+		   if(spriteList.get(i) != null) {
+			   if(spriteList.get(i).getType() == 0) {
+				   Sprite temp = spriteList.pop(i);
+				   temp.move(0, 0);
+				   spriteList.add(temp);
+			   } else if(spriteList.get(i).getType() == 1) {
+               Sprite temp = spriteList.pop(i);
+               temp.move(15, 0);
+               spriteList.add(temp);
+            } else if(spriteList.get(i).getType() == 2) {
+               Sprite temp = spriteList.pop(i);
+               temp.move(0, 13);
+               spriteList.add(temp);
+            } else if(spriteList.get(i).getType() == 3) {
+               Sprite temp = spriteList.pop(i);
+               temp.move(15, 13);
+               spriteList.add(temp);
+            }
+		   }
+	   }
+	   String myImage = "Resources/Enemy2A.png";
+	   int enemyCount = 0;
+	   while(enemyCount < 3) {
+	      int x = (int)(Math.random()*14)+1;
+	      int y = (int)(Math.random()*12)+1;
+	      Sprite addSprite = new Sprite("Resources/Enemy2A.png", 10, x, y);
+	      if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+	         spriteList.add(addSprite);
+	         enemyCount++;
+	      }
+	   }
+	   int foodCount = 1;
+      while(foodCount < 7) {
+         int x = (int)(Math.random()*14)+1;
+         int y = (int)(Math.random()*12)+1;
+         Sprite addSprite = new Sprite("Resources/ItemFood" + foodCount + ".png", 20, x, y);
+         if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+            spriteList.add(addSprite);
+            foodCount++;
+         }
+      }
+    }
+  }
 }
+
+
+
