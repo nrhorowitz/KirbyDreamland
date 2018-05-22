@@ -52,6 +52,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    
    
    public ClientScreen() {
+      this.playSound(LEVEL_0_MUSIC);
       this.setLayout(null);
       spriteList = new HashTable<Sprite>(16*16);
      level = 0;
@@ -63,7 +64,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
      this.addMouseListener(this);
       this.setFocusable(true);
      createImages();
-	 playSound(LEVEL_0_MUSIC);
+	 
    }
    
    public Dimension getPreferredSize() 
@@ -267,12 +268,17 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    }
    
    public void playSound(String fileName) {
- 
+      System.out.println("URL0: " + fileName);
         try {
+           System.out.println("URL1");
             URL url = this.getClass().getClassLoader().getResource(fileName);
+            System.out.println("URL2");
             Clip clip = AudioSystem.getClip();
+            System.out.println("URL3");
             clip.open(AudioSystem.getAudioInputStream(url));
+            System.out.println("URL4");
             clip.start();
+            System.out.println("URL5");
         } catch (Exception exc) {
             exc.printStackTrace(System.out);
         }

@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Manager {
  private ArrayList<ServerThread> threads;
@@ -96,20 +98,94 @@ public class Manager {
     for(int i=0; i<spriteList.rawSize(); i++) {
        if(spriteList.get(i) != null) {
           if(spriteList.get(i).getType() == 10) {//enemy
-             //find the closest player
-             int closestPlayer = 0;
-             //find the id of the closest player
-             int closestPlayerId = 0;
+             //find the closest player (index)
+             int movement = -1; //NESW
+             int enemyX = spriteList.get(i).getX();
+             int enemyY = spriteList.get(i).getY();
+             int enemyHash = (enemyX * 16) + enemyY;
+             int closestPlayer = closestPlayer(enemyX, enemyY);
              //pick x or y to move
-             int xy = 0;
+             int xy = (int)(Math.random() * 2);//0-x, 1-y
+             while(movement == -1) {
+                if(xy == 3) {
+                   if(spriteList.get(enemyHash+16) == null) {
+                      movement = 1;
+                   } 
+                } else if(xy%2 == 0) {
+                   if(spriteList.get(closestPlayer).getX() > enemyX) {
+                      if(spriteList.get(enemyHash+16) == null) {
+                         movement = 1;
+                      } else if(spriteList.get(enemyHash-16) == null) {
+                         movement = 3;
+                      } else if(spriteList.get(enemyHash+1) == null) {
+                         movement = 2;
+                      } else if(spriteList.get(enemyHash-1) == null) {
+                         movement = 0;
+                      }
+                   } else if(spriteList.get(closestPlayer).getX() < enemyX) {
+                      if(spriteList.get(enemyHash-16) == null) {
+                         movement = 3;
+                      }
+                   } else {
+                      xy++;
+                   }
+                } else {
+                   if(spriteList.get(closestPlayer).getY() > enemyY) {
+                      if(spriteList.get(enemyHash+1) == null) {
+                         movement = 2;
+                      }
+                   } else if(spriteList.get(closestPlayer).getY() < enemyY) {
+                      if(spriteList.get(enemyHash-1) == null) {
+                         movement = 0;
+                      }
+                   } else {
+                      xy++;
+                   }
+                }
+             }
              //move sprite if legal move
              Sprite temp = spriteList.pop(i);
-             temp.move(temp.getX(), temp.getY()-1);
+             if(movement == 0) {
+                temp.move(temp.getX(), temp.getY()-1);
+             } else if(movement == 1) {
+                temp.move(temp.getX()+1, temp.getY());
+             } else if(movement == 2) {
+                temp.move(temp.getX(), temp.getY()+1);
+             } else if(movement == 3) {
+                temp.move(temp.getX()-1, temp.getY());
+             }
              spriteList.add(temp);
           }
        }
     }
     update(spriteList);
+ }
+ private int closestPlayer(int enemyX, int enemyY) {
+    Map<Integer, Integer> playerMap = new HashMap<Integer, Integer>(); //distance,index
+    int maxDistance = -1;
+    for(int i=0; i<spriteList.rawSize(); i++) {
+       if(spriteList.getList(i).size() > 0) {
+          if(spriteList.get(i).getType() < 4) {
+             int currentDistance = (Math.abs(spriteList.get(i).getX()-enemyX))+(Math.abs(spriteList.get(i).getY()-enemyY));
+             if(currentDistance > maxDistance) {
+                playerMap.put(currentDistance,i);
+                maxDistance = currentDistance;
+             }
+          }
+       }
+    }
+    return playerMap.get(maxDistance);
+ }
+ public void resetCharacter(int characterType) {
+    for(int i=0; i<spriteList.rawSize(); i++) {
+       if(spriteList.get(i) != null) {
+          if(spriteList.get(i).getType() == characterType) {
+             Sprite temp = spriteList.pop(i);
+             temp.move(0, 0);
+             spriteList.add(temp);
+          }
+       }
+    }
  }
  private void beginLevel(int myLevel) {
     if(myLevel == 1) {

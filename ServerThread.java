@@ -73,7 +73,13 @@ public class ServerThread implements Runnable {
                            temp.move(temp.getX(),temp.getY()-1);
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
-   				         }
+   				         } else if(spriteList.get(uniqueId-1).getType() == 10) { //enemy
+                           Sprite temp = spriteList.pop(uniqueId);
+                           Sprite food = spriteList.pop(uniqueId-1);
+                           temp.move(temp.getX(),temp.getY()-1);
+                           temp.addItem(food.getFileName());
+                           spriteList.add(temp);
+                        }
    				      }
    				   }
    				} else if(commandMessage.equals("down")) {
@@ -89,6 +95,8 @@ public class ServerThread implements Runnable {
                            temp.move(temp.getX(),temp.getY()+1);
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
+                        } else if(spriteList.get(uniqueId+1).getType() == 10) { //enemy
+                           manager.resetCharacter(spriteList.get(uniqueId).getType());
                         }
                      }
    				   }
@@ -105,6 +113,8 @@ public class ServerThread implements Runnable {
                            temp.move(temp.getX()-1,temp.getY());
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
+                        } else if(spriteList.get(uniqueId-16).getType() == 10) { //enemy
+                           manager.resetCharacter(spriteList.get(uniqueId).getType());
                         }
                      }
                   }
@@ -121,6 +131,8 @@ public class ServerThread implements Runnable {
                            temp.move(temp.getX()+1,temp.getY());
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
+                        } else if(spriteList.get(uniqueId+16).getType() == 10) { //enemy
+                           manager.resetCharacter(spriteList.get(uniqueId).getType());
                         }
                      }
                   }

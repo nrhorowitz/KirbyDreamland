@@ -10,7 +10,9 @@ public class HashTable<E> implements Serializable {
    }
    public void add(E myData) {
       table[myData.hashCode()].add(myData);
-      System.out.println(myData.toString());
+   }
+   public void addToFront(E myData) {
+      table[myData.hashCode()].addToFront(myData);
    }
    public void remove(E myData) {
       table[myData.hashCode()].remove(myData);
@@ -24,7 +26,10 @@ public class HashTable<E> implements Serializable {
       return table[index];
    }
    public E get(int index) {
-	   return table[index].get(0);
+      if((index >= 0) && (index < table.length)) {
+         return table[index].get(0);
+      }
+	   return null;
    }
    public E get(int index, int listIndex) {
       return table[index].get(listIndex);

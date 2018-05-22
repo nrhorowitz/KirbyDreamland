@@ -5,20 +5,23 @@ public class DLList<E> implements Serializable {
   private int size;
   
   public DLList() {
-    head = new Node(null);
-    tail = new Node(null);
+    head = new Node<E>(null);
+    tail = new Node<E>(null);
     head.setNext(tail);
     tail.setPrev(head);
     size = 0;
   }
   
   public void add(E myData) {
-    Node<E> addNode = new Node(myData);
+    Node<E> addNode = new Node<E>(myData);
     tail.prev().setNext(addNode);
     addNode.setPrev(tail.prev());
     addNode.setNext(tail);
     tail.setPrev(addNode);
     size++;
+  }
+  public void addToFront(E myData) {
+     head = new Node<E>(myData);
   }
   public E get(int index) {
     Node<E> current = head.next();
