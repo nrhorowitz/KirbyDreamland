@@ -8,6 +8,8 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Queue;
+import java.util.PriorityQueue;
 
 public class Manager {
  private ArrayList<ServerThread> threads;
@@ -40,6 +42,9 @@ public class Manager {
  }
  
  public int addPlayer() {
+   if(level != 0) {
+      return -1;
+   }
    String myImage;
    int count = spriteList.size();
    if(count == 0) {
@@ -94,7 +99,19 @@ public class Manager {
        beginLevel(level);
     }
  }
+ public void checkPlayersReady() {
+    int playersReady = 0;
+    for(int i=0; i<spriteList.rawSize(); i++) {
+       if(spriteList.getList(i) != null) {
+          if(spriteList.getList(i).size() == 2) {
+             playersReady++;
+          }
+       }
+    }
+    setPlayersReady(playersReady);
+ }
  public void moveEnemies() {
+	Queue<Integer> movements = new PriorityQueue<Integer>(); //(index*10)+movement
     for(int i=0; i<spriteList.rawSize(); i++) {
        if(spriteList.get(i) != null) {
           if(spriteList.get(i).getType() == 10) {//enemy
@@ -110,22 +127,26 @@ public class Manager {
                 if(xy == 3) {
                    if(spriteList.get(enemyHash+16) == null) {
                       movement = 1;
-                   } 
+                   } else if(spriteList.get(enemyHash-16) == null) {
+					 movement = 3;
+				  } else if(spriteList.get(enemyHash+1) == null) {
+					 movement = 2;
+				  } else if((spriteList.get(enemyHash-1) == null)) {
+					 movement = 0;
+				  }
                 } else if(xy%2 == 0) {
                    if(spriteList.get(closestPlayer).getX() > enemyX) {
                       if(spriteList.get(enemyHash+16) == null) {
                          movement = 1;
-                      } else if(spriteList.get(enemyHash-16) == null) {
-                         movement = 3;
-                      } else if(spriteList.get(enemyHash+1) == null) {
-                         movement = 2;
-                      } else if(spriteList.get(enemyHash-1) == null) {
-                         movement = 0;
-                      }
+                      } else {
+						 xy++;
+					  }
                    } else if(spriteList.get(closestPlayer).getX() < enemyX) {
                       if(spriteList.get(enemyHash-16) == null) {
                          movement = 3;
-                      }
+                      } else {
+						 xy++;
+					  }
                    } else {
                       xy++;
                    }
@@ -133,32 +154,45 @@ public class Manager {
                    if(spriteList.get(closestPlayer).getY() > enemyY) {
                       if(spriteList.get(enemyHash+1) == null) {
                          movement = 2;
-                      }
+                      } else {
+						  xy++;
+					  }
                    } else if(spriteList.get(closestPlayer).getY() < enemyY) {
                       if(spriteList.get(enemyHash-1) == null) {
                          movement = 0;
-                      }
+                      } else {
+						  xy++;
+					  }
                    } else {
                       xy++;
                    }
                 }
              }
-             //move sprite if legal move
-             Sprite temp = spriteList.pop(i);
-             if(movement == 0) {
-                temp.move(temp.getX(), temp.getY()-1);
-             } else if(movement == 1) {
-                temp.move(temp.getX()+1, temp.getY());
-             } else if(movement == 2) {
-                temp.move(temp.getX(), temp.getY()+1);
-             } else if(movement == 3) {
-                temp.move(temp.getX()-1, temp.getY());
-             }
-             spriteList.add(temp);
+			 //store legal move in movements
+			 movements.add((i*10)+movement);
           }
        }
+	   //move sprite for the legal move
+	   while(!movements.isEmpty()) {
+		   int moveData = movements.poll();
+		   int index = moveData/10;
+		   int movement = moveData%10;
+			Sprite temp = spriteList.pop(index);
+			if(movement == 0) {
+				temp.move(temp.getX(), temp.getY()-1);
+			} else if(movement == 1) {
+				temp.move(temp.getX()+1, temp.getY());
+			} else if(movement == 2) {
+				temp.move(temp.getX(), temp.getY()+1);
+			} else if(movement == 3) {
+				temp.move(temp.getX()-1, temp.getY());
+			}
+			spriteList.add(temp);
+	   }
+		 
     }
-    update(spriteList);
+	
+    update(spriteList); 
  }
  private int closestPlayer(int enemyX, int enemyY) {
     Map<Integer, Integer> playerMap = new HashMap<Integer, Integer>(); //distance,index
@@ -181,7 +215,15 @@ public class Manager {
        if(spriteList.get(i) != null) {
           if(spriteList.get(i).getType() == characterType) {
              Sprite temp = spriteList.pop(i);
-             temp.move(0, 0);
+             if(characterType == 0) {
+                temp.move(0, 0);
+             } else if(characterType == 1) {
+                temp.move(15, 0);
+             } else if(characterType == 2) {
+                temp.move(0, 15);
+             } else if(characterType == 3) {
+                temp.move(15, 15);
+             }
              spriteList.add(temp);
           }
        }
@@ -231,9 +273,36 @@ public class Manager {
             foodCount++;
          }
       }
+      int doorCount = 0;
+      while(doorCount < threads.size()) {
+         int x = (int)(Math.random()*14)+1;
+         int y = (int)(Math.random()*12)+1;
+         Sprite addSprite = new Sprite("Resources/Door.png", 30, x, y);
+         if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+            spriteList.add(addSprite);
+            doorCount++;
+         }
+      }
+      int obstacleCount = 0;
+      while(obstacleCount < 10) {
+         int x = (int)(Math.random()*14)+1;
+         int y = (int)(Math.random()*12)+1;
+         Sprite addSprite = new Sprite("Resources/treeobstacle.png", 40, x, y);
+         if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+            spriteList.add(addSprite);
+            obstacleCount++;
+         }
+      }
     }
+    playersReady = 0;
+  }
+  private void clearMap() {
+     for(int i=0; i<spriteList.rawSize(); i++) {
+        for(int j=0; j<spriteList.getList(i).size(); j++) {
+           if(spriteList.get(i, j).getType() > 5) {
+              spriteList.getList(i).remove(spriteList.get(i, j));
+           }
+        }
+     }
   }
 }
-
-
-

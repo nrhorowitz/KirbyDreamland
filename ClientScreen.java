@@ -52,12 +52,12 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    
    
    public ClientScreen() {
+      type = -1;
       this.playSound(LEVEL_0_MUSIC);
       this.setLayout(null);
       spriteList = new HashTable<Sprite>(16*16);
      level = 0;
      id=-1;
-     type = -1;
       readyToBegin = false;
      imageStrings = new HashMap<String,BufferedImage>();
       this.addKeyListener(this);
@@ -82,7 +82,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
     
     public void drawHashTable(Graphics g) {
        for(int i=0; i<spriteList.rawSize(); i++) {
-          for(int j=0; j<spriteList.getList(i).size(); j++) {
+          for(int j=spriteList.getList(i).size()-1; j>=0; j--) {
              g.drawImage(imageStrings.get(spriteList.getList(i).get(j).getFileName()), spriteList.getList(i).get(j).getX()*50, spriteList.getList(i).get(j).getY()*50, null);
           }
        }
@@ -105,6 +105,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
         BufferedImage food4AImage = ImageIO.read(new File ("Resources/ItemFood4.png"));
         BufferedImage food5AImage = ImageIO.read(new File ("Resources/ItemFood5.png"));
         BufferedImage food6AImage = ImageIO.read(new File ("Resources/ItemFood6.png"));
+        BufferedImage doorImage = ImageIO.read(new File ("Resources/Door.png"));
+        BufferedImage level2BackgroundImage = ImageIO.read(new File ("Resources/space.png"));
+        BufferedImage treeObstacleImage = ImageIO.read(new File ("Resources/treeobstacle.png"));
         imageStrings.put("Resources/StartScreen2.png",myStartImage);
         imageStrings.put("Resources/ReadyButton0.png",readyButtonImage0);
         imageStrings.put("Resources/ReadyButton1.png",readyButtonImage1);
@@ -120,6 +123,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
         imageStrings.put("Resources/ItemFood4.png", food4AImage);
         imageStrings.put("Resources/ItemFood5.png", food5AImage);
         imageStrings.put("Resources/ItemFood6.png", food6AImage);
+        imageStrings.put("Resources/Door.png", doorImage);
+        imageStrings.put("Resources/space.png", level2BackgroundImage);
+        imageStrings.put("Resources/treeobstacle.png", treeObstacleImage);
         
      } catch (FileNotFoundException ex) {
         System.out.println(ex);
@@ -155,7 +161,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
             if(spriteList.get(i).getType() < 4) {
                g.drawString("PLAYER " + (spriteList.get(i).getType()+1) + ":", INVENTORY_X, INVENTORY_Y + (INVENTORY_Y_SCALE*spriteList.get(i).getType()));
                for(int j=0; j<spriteList.get(i).getItemList().size(); j++) {
-                  g.drawImage(imageStrings.get(spriteList.get(i).getItem(j)), INVENTORY_X + (INVENTORY_X_SCALE * j), INVENTORY_Y + (INVENTORY_Y_SCALE*spriteList.get(i).getType()) + (INVENTORY_Y_ITEM_SCALE * (j/6)), null);
+                  g.drawImage(imageStrings.get(spriteList.get(i).getItem(j)), INVENTORY_X + (INVENTORY_X_SCALE * j) - ((j/6) * (INVENTORY_X_SCALE * 6)), INVENTORY_Y + (INVENTORY_Y_SCALE*spriteList.get(i).getType()) + (INVENTORY_Y_ITEM_SCALE * (j/6)), null);
                }
             }
          }
@@ -175,7 +181,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
          if(spriteList == null) {
             return;
          }
-         System.out.println("ID: " + id + " SPRITELIST: " + spriteList);
+         //System.out.println("ID: " + id + " SPRITELIST: " + spriteList);
          if(spriteList.get(id).getType() == 0) {
             g.setColor(Color.pink);
          } else if(spriteList.get(id).getType() == 1) {
@@ -190,6 +196,8 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
          g.drawImage(imageStrings.get("Resources/Level1Background.png"),0,0,null);
          drawGrid(g);
          drawInventory(g);
+      } else if(level == 2) {
+         g.drawImage(imageStrings.get("Resources/space.png"), 0, 0, null);
       }
    }
    
@@ -204,7 +212,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
       return -1;
    }
    
-   public void poll() {
+   public int poll() {
       String hostName="localhost";
       int portNumber=1023;
       try {
@@ -214,8 +222,10 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
          ObjectInputStream inObj = new ObjectInputStream(serverSocket.getInputStream());
          
          id=(Integer) inObj.readObject();
-         System.out.println("id: "+id);
-         
+         if(id == -1) {
+            System.out.println("GAME ALREADY STARTED! Please connect later");
+            return -1;
+         }
          while(true) {
             try {
                Thread.sleep(10);
@@ -225,12 +235,16 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
             Object objectFromServer = inObj.readObject();
             if(objectFromServer instanceof String) {
                String fromServer = (String)objectFromServer;
-               System.out.println(fromServer);
+               //System.out.println(fromServer);
                String[] commands = fromServer.split(":");
                if(commands[0].equals("level")) {
                   int levelSet = Integer.parseInt(commands[1]);
                   level = levelSet;
-               }
+               } else if(commands[0].equals("sound")) {
+				   String fileToPlay = commands[1];
+				   System.out.println("PLAY " + fileToPlay);
+				   playSound(fileToPlay);
+			   }
             } else { //is a HashTable
                HashTable<Sprite> fromServer = (HashTable<Sprite>)objectFromServer;
                if(fromServer==null) {
@@ -255,6 +269,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
          System.err.println("Error class not found " + hostName);
          System.exit(1);
       }
+      return 0;
    }
    
    private void writeObject(Object o) {
@@ -268,17 +283,11 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    }
    
    public void playSound(String fileName) {
-      System.out.println("URL0: " + fileName);
         try {
-           System.out.println("URL1");
             URL url = this.getClass().getClassLoader().getResource(fileName);
-            System.out.println("URL2");
             Clip clip = AudioSystem.getClip();
-            System.out.println("URL3");
             clip.open(AudioSystem.getAudioInputStream(url));
-            System.out.println("URL4");
             clip.start();
-            System.out.println("URL5");
         } catch (Exception exc) {
             exc.printStackTrace(System.out);
         }

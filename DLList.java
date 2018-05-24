@@ -21,7 +21,12 @@ public class DLList<E> implements Serializable {
     size++;
   }
   public void addToFront(E myData) {
-     head = new Node<E>(myData);
+     Node<E> addNode = new Node<E>(myData);
+     addNode.setNext(head.next());
+     head.next().setPrev(addNode);
+     head.setNext(addNode);
+     addNode.setPrev(head);
+     size++;
   }
   public E get(int index) {
     Node<E> current = head.next();

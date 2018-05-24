@@ -48,7 +48,7 @@ public class ServerThread implements Runnable {
    			Object objectFromServer = inObj.readObject();
    			if(objectFromServer instanceof String) {
    				String fromServer = (String)objectFromServer;
-   				System.out.println(fromServer);
+   				//System.out.println(fromServer);
    				String[] commandArray = fromServer.split(":");
    				int uniqueId = Integer.parseInt(commandArray[0]);
    				//System.out.println("UNIQUEID: " + uniqueId + " SPRITE:" + spriteList.get(uniqueId) + "\nLIST:" + spriteList);
@@ -73,12 +73,20 @@ public class ServerThread implements Runnable {
                            temp.move(temp.getX(),temp.getY()-1);
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
+						   send("sound:Resources/kirbymove.wav");
    				         } else if(spriteList.get(uniqueId-1).getType() == 10) { //enemy
                            Sprite temp = spriteList.pop(uniqueId);
                            Sprite food = spriteList.pop(uniqueId-1);
                            temp.move(temp.getX(),temp.getY()-1);
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
+						   send("sound:Resources/kirbymove.wav");
+                        } else if(spriteList.get(uniqueId-1).getType() == 30) { //door
+                           Sprite temp = spriteList.pop(uniqueId);
+                           temp.move(temp.getX(),temp.getY()-1);
+                           spriteList.addToFront(temp);//ADDTOFRONT
+                           send("sound:Resources/kirbymove.wav");
+                           manager.checkPlayersReady();
                         }
    				      }
    				   }
@@ -95,8 +103,16 @@ public class ServerThread implements Runnable {
                            temp.move(temp.getX(),temp.getY()+1);
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
+						   send("sound:Resources/kirbymove.wav");
                         } else if(spriteList.get(uniqueId+1).getType() == 10) { //enemy
                            manager.resetCharacter(spriteList.get(uniqueId).getType());
+						   send("sound:Resources/kirbydamage.wav");
+                        } else if(spriteList.get(uniqueId+1).getType() == 30) { //door
+                           Sprite temp = spriteList.pop(uniqueId);
+                           temp.move(temp.getX(),temp.getY()+1);
+                           spriteList.addToFront(temp);//ADDTOFRONT
+                           send("sound:Resources/kirbymove.wav");
+                           manager.checkPlayersReady();
                         }
                      }
    				   }
@@ -113,8 +129,16 @@ public class ServerThread implements Runnable {
                            temp.move(temp.getX()-1,temp.getY());
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
+						   send("sound:Resources/kirbymove.wav");
                         } else if(spriteList.get(uniqueId-16).getType() == 10) { //enemy
                            manager.resetCharacter(spriteList.get(uniqueId).getType());
+						   send("sound:Resources/kirbydamage.wav");
+                        } else if(spriteList.get(uniqueId-16).getType() == 30) { //door
+                           Sprite temp = spriteList.pop(uniqueId);
+                           temp.move(temp.getX()-1,temp.getY());
+                           spriteList.addToFront(temp);//ADDTOFRONT
+                           send("sound:Resources/kirbymove.wav");
+                           manager.checkPlayersReady();
                         }
                      }
                   }
@@ -131,8 +155,16 @@ public class ServerThread implements Runnable {
                            temp.move(temp.getX()+1,temp.getY());
                            temp.addItem(food.getFileName());
                            spriteList.add(temp);
+						   send("sound:Resources/kirbymove.wav");
                         } else if(spriteList.get(uniqueId+16).getType() == 10) { //enemy
                            manager.resetCharacter(spriteList.get(uniqueId).getType());
+						   send("sound:Resources/kirbydamage.wav");
+                        } else if(spriteList.get(uniqueId+16).getType() == 30) { //door
+                           Sprite temp = spriteList.pop(uniqueId);
+                           temp.move(temp.getX()+1,temp.getY());
+                           spriteList.addToFront(temp);//ADDTOFRONT
+                           send("sound:Resources/kirbymove.wav");
+                           manager.checkPlayersReady();
                         }
                      }
                   }

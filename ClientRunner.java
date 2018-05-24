@@ -3,7 +3,7 @@ import javax.swing.JFrame;
 public class ClientRunner {
     public static void main(String args[]) {
  
-        JFrame frame = new JFrame("Client Final");
+        JFrame frame = new JFrame("Kirby's Dreamland (Pls don't sue me)");
 
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -17,7 +17,10 @@ public class ClientRunner {
       frame.pack();
       frame.setResizable(false);
       
-      sc.poll();
+      int close = sc.poll();
+      if(close == -1) {
+         frame.setVisible(false);
+      }
       //sc.animate();
     }
 }
