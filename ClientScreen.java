@@ -181,6 +181,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
          if(spriteList == null) {
             return;
          }
+         if(spriteList.size() == 0) {
+            return;
+         }
          //System.out.println("ID: " + id + " SPRITELIST: " + spriteList);
          if(spriteList.get(id).getType() == 0) {
             g.setColor(Color.pink);
@@ -213,7 +216,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    }
    
    public int poll() {
-      String hostName="localhost";
+      //String hostName="10.200.4.192";//CHANGE TO IP
+      String hostName = "localhost";
+      //MVLA FACULTY - 10.200.4.192
       int portNumber=1023;
       try {
          Socket serverSocket=new Socket(hostName,portNumber);
@@ -247,7 +252,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 			   }
             } else { //is a HashTable
                HashTable<Sprite> fromServer = (HashTable<Sprite>)objectFromServer;
-               if(fromServer==null) {
+               if((fromServer==null) || (id == -1)) {
                   break;
                }
                spriteList = fromServer;
