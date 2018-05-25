@@ -53,7 +53,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    
    public ClientScreen() {
       type = -1;
-      this.playSound(LEVEL_0_MUSIC);
+      this.playSoundLoop(LEVEL_0_MUSIC,10);
       this.setLayout(null);
       spriteList = new HashTable<Sprite>(16*16);
      level = 0;
@@ -109,6 +109,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
         BufferedImage level2BackgroundImage = ImageIO.read(new File ("Resources/Level2Background.png"));
         BufferedImage treeObstacleImage = ImageIO.read(new File ("Resources/treeobstacle.png"));
 		BufferedImage cloudObstacleImage = ImageIO.read(new File ("Resources/cloudobstacle.png"));
+		BufferedImage level3BackgroundImage = ImageIO.read(new File ("Resources/Level3Background.png"));
         imageStrings.put("Resources/StartScreen2.png",myStartImage);
         imageStrings.put("Resources/ReadyButton0.png",readyButtonImage0);
         imageStrings.put("Resources/ReadyButton1.png",readyButtonImage1);
@@ -128,6 +129,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
         imageStrings.put("Resources/Level2Background.png", level2BackgroundImage);
         imageStrings.put("Resources/treeobstacle.png", treeObstacleImage);
 		imageStrings.put("Resources/cloudobstacle.png", cloudObstacleImage);
+		imageStrings.put("Resources/Level3Background.png", level3BackgroundImage);
         
      } catch (FileNotFoundException ex) {
         System.out.println(ex);
@@ -147,6 +149,30 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    }
    
    public void drawInventory(Graphics g) {
+      Font myFont = new Font("Arial",40,40);
+      g.setFont(myFont);
+      for(int i=0; i<spriteList.rawSize(); i++) {
+         if(spriteList.getList(i).size() > 0) {
+            if(spriteList.get(i).getType() == 0) {
+               g.setColor(Color.pink);
+            } else if(spriteList.get(i).getType() == 1) {
+               g.setColor(Color.orange);
+            } else if(spriteList.get(i).getType() == 2) {
+               g.setColor(Color.cyan);
+            } else if(spriteList.get(i).getType() == 3) {
+               g.setColor(Color.red);
+            }
+            if(spriteList.get(i).getType() < 4) {
+               g.drawString("PLAYER " + (spriteList.get(i).getType()+1) + ":", INVENTORY_X, INVENTORY_Y + (INVENTORY_Y_SCALE*spriteList.get(i).getType()));
+               for(int j=0; j<spriteList.get(i).getItemList().size(); j++) {
+                  g.drawImage(imageStrings.get(spriteList.get(i).getItem(j)), INVENTORY_X + (INVENTORY_X_SCALE * j) - ((j/6) * (INVENTORY_X_SCALE * 6)), INVENTORY_Y + (INVENTORY_Y_SCALE*spriteList.get(i).getType()) + (INVENTORY_Y_ITEM_SCALE * (j/6)), null);
+               }
+            }
+         }
+      }
+   }
+   
+   public void drawInventoryFinal(Graphics g) {
       Font myFont = new Font("Arial",40,40);
       g.setFont(myFont);
       for(int i=0; i<spriteList.rawSize(); i++) {
@@ -202,8 +228,13 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
          drawGrid(g);
          drawInventory(g);
       } else if(level == 2) {
-         g.drawImage(imageStrings.get("Resources/space.png"), 0, 0, null);
-      }
+         g.drawImage(imageStrings.get("Resources/Level2Background.png"), 0, 0, null);
+		 drawGrid(g);
+		 drawInventory(g);
+      } else if(level == 3) {
+		 g.drawImage(imageStrings.get("Resources/Level3Background.png"), -100, 0, null);
+		 drawInventoryFinal(g);
+	  }
    }
    
    public int getLocation(int myType) {
@@ -218,9 +249,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    }
    
    public int poll() {
-      String hostName="10.200.4.192";//CHANGE TO IP
+      String hostName="10.200.4.195";//CHANGE TO IP
       //String hostName = "localhost";
-      //MVLA FACULTY - 10.200.4.192
+      //MVLA FACULTY - 10.200.4.195
       int portNumber=1023;
       try {
          Socket serverSocket=new Socket(hostName,portNumber);
@@ -299,6 +330,17 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
             exc.printStackTrace(System.out);
         }
     }
+	
+	public void playSoundLoop(String fileName, int loop) {
+        try {
+            URL url = this.getClass().getClassLoader().getResource(fileName);
+            Clip clip = AudioSystem.getClip();
+            clip.open(AudioSystem.getAudioInputStream(url));
+            clip.loop(loop);
+        } catch (Exception exc) {
+            exc.printStackTrace(System.out);
+        }
+    }
    
    public void keyPressed(KeyEvent e) {
         //System.out.println(e.getKeyCode());
@@ -312,7 +354,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
             outObj.writeObject(id + ":down");
          } else if(e.getKeyCode() == 68) { //d
             outObj.writeObject(id + ":right");
-         }
+         } else if(e.getKeyCode() == 80) { //p
+			outObj.writeObject(id + ":level: :cheat");
+		 }
       }
       catch(IOException ex) {}
         // if (e.getKeyCode() == 87) { //w

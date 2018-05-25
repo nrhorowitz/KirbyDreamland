@@ -59,7 +59,9 @@ public class ServerThread implements Runnable {
    				      manager.setPlayersReady(manager.getPlayersReady()+1);
    				   } else if(readyToBeginMessage.equals("false")) {
    				      manager.setPlayersReady(manager.getPlayersReady()-1);
-   				   }
+   				   } else if(readyToBeginMessage.equals("cheat")) {
+					  manager.setPlayersReady(manager.getThreadsSize());
+				   }
    				} else if(commandMessage.equals("up")) {
    				   if(spriteList.get(uniqueId).getY() > 0) {
    				      if(spriteList.getList((uniqueId-1)).size() == 0) {

@@ -90,6 +90,9 @@ public class Manager {
  public int getPlayersReady() {
     return playersReady;
  }
+ public int getThreadsSize() {
+	 return threads.size();
+ }
  public void setPlayersReady(int myPlayersReady) {
     playersReady = myPlayersReady;
     if(playersReady == threads.size()) {
@@ -229,7 +232,7 @@ public class Manager {
        }
     }
  }
- private void beginLevel(int myLevel) {
+ public void beginLevel(int myLevel) {
     if(myLevel == 1) {
 	   for(int i=0; i<spriteList.rawSize(); i++) {
 		   if(spriteList.get(i) != null) {
@@ -252,7 +255,6 @@ public class Manager {
             }
 		   }
 	   }
-	   String myImage = "Resources/Enemy2A.png";
 	   int enemyCount = 0;
 	   while(enemyCount < 3) {
 	      int x = (int)(Math.random()*14)+1;
@@ -293,7 +295,72 @@ public class Manager {
             obstacleCount++;
          }
       }
-    }
+    } else if(myLevel == 2) {
+		clearMap();
+		for(int i=0; i<spriteList.rawSize(); i++) {
+		   if(spriteList.get(i) != null) {
+			   if(spriteList.get(i).getType() == 0) {
+				   Sprite temp = spriteList.pop(i);
+				   temp.move(0, 0);
+				   spriteList.add(temp);
+			   } else if(spriteList.get(i).getType() == 1) {
+               Sprite temp = spriteList.pop(i);
+               temp.move(15, 0);
+               spriteList.add(temp);
+            } else if(spriteList.get(i).getType() == 2) {
+               Sprite temp = spriteList.pop(i);
+               temp.move(0, 13);
+               spriteList.add(temp);
+            } else if(spriteList.get(i).getType() == 3) {
+               Sprite temp = spriteList.pop(i);
+               temp.move(15, 13);
+               spriteList.add(temp);
+            }
+		   }
+	   }
+	   int enemyCount = 0;
+	   while(enemyCount < 8) {
+	      int x = (int)(Math.random()*14)+1;
+	      int y = (int)(Math.random()*12)+1;
+	      Sprite addSprite = new Sprite("Resources/Enemy2A.png", 10, x, y);
+	      if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+	         spriteList.add(addSprite);
+	         enemyCount++;
+	      }
+	   }
+	   int foodCount = 1;
+      while(foodCount < 7) {
+         int x = (int)(Math.random()*14)+1;
+         int y = (int)(Math.random()*12)+1;
+         Sprite addSprite = new Sprite("Resources/ItemFood" + foodCount + ".png", 20, x, y);
+         if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+            spriteList.add(addSprite);
+            foodCount++;
+         }
+      }
+      int doorCount = 0;
+      while(doorCount < threads.size()) {
+         int x = (int)(Math.random()*14)+1;
+         int y = (int)(Math.random()*12)+1;
+         Sprite addSprite = new Sprite("Resources/Door.png", 30, x, y);
+         if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+            spriteList.add(addSprite);
+            doorCount++;
+         }
+      }
+      int obstacleCount = 0;
+      while(obstacleCount < 20) {
+         int x = (int)(Math.random()*14)+1;
+         int y = (int)(Math.random()*12)+1;
+         Sprite addSprite = new Sprite("Resources/cloudobstacle.png", 40, x, y);
+         if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+            spriteList.add(addSprite);
+            obstacleCount++;
+         }
+      }
+	} else if(myLevel == 3) {
+		clearMap();
+	}
     playersReady = 0;
   }
   private void clearMap() {
