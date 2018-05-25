@@ -106,8 +106,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
         BufferedImage food5AImage = ImageIO.read(new File ("Resources/ItemFood5.png"));
         BufferedImage food6AImage = ImageIO.read(new File ("Resources/ItemFood6.png"));
         BufferedImage doorImage = ImageIO.read(new File ("Resources/Door.png"));
-        BufferedImage level2BackgroundImage = ImageIO.read(new File ("Resources/space.png"));
+        BufferedImage level2BackgroundImage = ImageIO.read(new File ("Resources/Level2Background.png"));
         BufferedImage treeObstacleImage = ImageIO.read(new File ("Resources/treeobstacle.png"));
+		BufferedImage cloudObstacleImage = ImageIO.read(new File ("Resources/cloudobstacle.png"));
         imageStrings.put("Resources/StartScreen2.png",myStartImage);
         imageStrings.put("Resources/ReadyButton0.png",readyButtonImage0);
         imageStrings.put("Resources/ReadyButton1.png",readyButtonImage1);
@@ -124,8 +125,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
         imageStrings.put("Resources/ItemFood5.png", food5AImage);
         imageStrings.put("Resources/ItemFood6.png", food6AImage);
         imageStrings.put("Resources/Door.png", doorImage);
-        imageStrings.put("Resources/space.png", level2BackgroundImage);
+        imageStrings.put("Resources/Level2Background.png", level2BackgroundImage);
         imageStrings.put("Resources/treeobstacle.png", treeObstacleImage);
+		imageStrings.put("Resources/cloudobstacle.png", cloudObstacleImage);
         
      } catch (FileNotFoundException ex) {
         System.out.println(ex);
@@ -181,6 +183,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
          if(spriteList == null) {
             return;
          }
+         if(spriteList.size() == 0) {
+            return;
+         }
          //System.out.println("ID: " + id + " SPRITELIST: " + spriteList);
          if(spriteList.get(id).getType() == 0) {
             g.setColor(Color.pink);
@@ -213,7 +218,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
    }
    
    public int poll() {
-      String hostName="localhost";
+      String hostName="10.200.4.192";//CHANGE TO IP
+      //String hostName = "localhost";
+      //MVLA FACULTY - 10.200.4.192
       int portNumber=1023;
       try {
          Socket serverSocket=new Socket(hostName,portNumber);
@@ -247,7 +254,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener {
 			   }
             } else { //is a HashTable
                HashTable<Sprite> fromServer = (HashTable<Sprite>)objectFromServer;
-               if(fromServer==null) {
+               if((fromServer==null) || (id == -1)) {
                   break;
                }
                spriteList = fromServer;
