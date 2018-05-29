@@ -87,7 +87,7 @@ public class ServerThread implements Runnable {
                            Sprite temp = spriteList.pop(uniqueId);
                            temp.move(temp.getX(),temp.getY()-1);
                            spriteList.addToFront(temp);//ADDTOFRONT
-                           send("sound:Resources/kirbymove.wav");
+                           send("sound:Resources/hit.wav");
                            manager.checkPlayersReady();
                         }
    				      }

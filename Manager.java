@@ -223,9 +223,9 @@ public class Manager {
              } else if(characterType == 1) {
                 temp.move(15, 0);
              } else if(characterType == 2) {
-                temp.move(0, 15);
+                temp.move(0, 13);
              } else if(characterType == 3) {
-                temp.move(15, 15);
+                temp.move(15, 13);
              }
              spriteList.add(temp);
           }
@@ -234,6 +234,18 @@ public class Manager {
  }
  public void beginLevel(int myLevel) {
     if(myLevel == 1) {
+       int doorCount = 0;
+       while(doorCount < threads.size()) {
+          int x = (int)(Math.random()*14)+1;
+          int y = (int)(Math.random()*12)+1;
+          Sprite addSprite = new Sprite("Resources/Door.png", 30, x, y);
+          if(spriteList.getList(addSprite.hashCode()).size() == 0) {
+             spriteList.add(addSprite);
+             doorCount++;
+          }
+       } 
+    } else if(myLevel == 2) {
+       clearMap();
 	   for(int i=0; i<spriteList.rawSize(); i++) {
 		   if(spriteList.get(i) != null) {
 			   if(spriteList.get(i).getType() == 0) {
@@ -295,7 +307,7 @@ public class Manager {
             obstacleCount++;
          }
       }
-    } else if(myLevel == 2) {
+    } else if(myLevel == 3) {
 		clearMap();
 		for(int i=0; i<spriteList.rawSize(); i++) {
 		   if(spriteList.get(i) != null) {
@@ -358,7 +370,7 @@ public class Manager {
             obstacleCount++;
          }
       }
-	} else if(myLevel == 3) {
+	} else if(myLevel == 4) {
 		clearMap();
 	}
     playersReady = 0;

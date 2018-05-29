@@ -1,0 +1,1 @@
+Challenge: Gameplay in a map, stored in HashTable
